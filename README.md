@@ -136,6 +136,20 @@ include “task.h”
 
 void vTaskList( char *pcWriteBuffer );
 
+State – The state of the task at the time vTaskList() was called, as follows:
+
+o ‘X’ if the task is executing (the task that called vTaskList()).执行
+
+o ‘B’ if the task is in the Blocked state.阻塞
+
+o ‘R’ if the task is in the Ready state.准备
+
+o ‘S’ if the task is in the Suspended state, or in the Blocked state without a 
+timeout.挂起（暂停）
+
+o ‘D’ if the task has been deleted, but the idle task has not yet freed the memory 
+that was being used by the task to hold its data structures and stack.
+
 
 # 使用xTaskCreate()进行参数设置时如果分配空间为1024会发生栈溢出（stack overflow）的情况; 
 
