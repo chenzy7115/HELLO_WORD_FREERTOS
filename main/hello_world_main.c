@@ -13,16 +13,23 @@
 #include "esp_system.h"
 #include "esp_spi_flash.h"
 
-// -----------------------------------------------------------------------------------------------
-void myTask(void *pvParam){
-    while (1)
-    {
-        printf("Hello world! In the tack!\n");
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
-    }
-    
+static const char *pcTxt = "I am CHENZY.";
+
+void myTask(void *pvParam)
+{
+    char *pcTxtInTask;
+    pcTxtInTask = pvParam;
+
+    printf("I got message: %s\n", pcTxtInTask);
+        
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
+
+    vTaskDelete(NULL);
 }
 
-void app_main(void){
-    xTaskCreate(myTask,"myTask1",1024,NULL,1,NULL);
+void app_main(void)
+{
+
+    xTaskCreate(myTask, "myTask1", 2048, (void *) pcTxt, 1, NULL);
 }
+
