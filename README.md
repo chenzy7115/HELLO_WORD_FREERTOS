@@ -111,6 +111,15 @@ include “task.h”
 
 void vTaskResume( TaskHandle_t pxTaskToResume );
 
+5./***挂起任务调度器，在被挂起后不能运行freeRTOS的API function ：***/ 
+Other FreeRTOS API functions must not be called while the scheduler is suspended.
+
+include “FreeRTOS.h”
+
+include “task.h”
+
+void vTaskSuspendAll( void );
+
 
 # 使用xTaskCreate()进行参数设置时如果分配空间为1024会发生栈溢出（stack overflow）的情况; 
 
