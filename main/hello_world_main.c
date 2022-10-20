@@ -17,7 +17,7 @@
 void myTask(void *pvParam){
     while (1)
     {
-        printf("Hello world! In the tack!");
+        printf("Hello world! In the tack!\n");
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
     
