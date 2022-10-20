@@ -121,8 +121,11 @@ include “task.h”
 void vTaskSuspendAll( void );
 
 6./***恢复任务调度器 ：***/ 
-#include “FreeRTOS.h”
-#include “task.h”
+
+include “FreeRTOS.h”
+
+include “task.h”
+
 BaseType_t xTaskResumeAll( void );
 
 7./***查看Task列表 ：***/用于调试是了解系统运行的情况
