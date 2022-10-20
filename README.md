@@ -2,21 +2,21 @@
 
 /**********变量**********/
 
-1.c Char
+1.c ： Char
 
-2.s int16_t，short
+2.s ： int16_t，short
 
-3.l int32_t，long
+3.l ： int32_t，long
 
-4.x BaseType_t，和其他非标准的类型：结构体、task handle、queue handle等
+4.x ：BaseType_t，和其他非标准的类型：结构体、task handle、queue handle等
 
-5.u unsigned
+5.u ：unsigned
 
-6.p 指针
+6.p ： 指针
 
-7.uc uint8_t，unsigned char
+7.uc ： uint8_t，unsigned char
 
-8.pc char指针
+8.pc ：char指针
 
 
 /**********函数**********/
@@ -29,19 +29,19 @@
 
 /**********宏**********/
 
-12.port (比如portMAX_DELAY) 在portable.h或portmacro.h
+12.port (比如portMAX_DELAY) ： 在portable.h或portmacro.h
 
-13.task (比如taskENTER_CRITICAL()) task.h
+13.task (比如taskENTER_CRITICAL()) ： task.h
 
-14.pd (比如pdTRUE) projdefs.h
+14.pd (比如pdTRUE)：  projdefs.h
 
-15.config (比如configUSE_PREEMPTION) FreeRTOSConfig.h
+15.config (比如configUSE_PREEMPTION) ： FreeRTOSConfig.h
 
-16.err (比如errQUEUE_FULL) projdefs.h
+16.err (比如errQUEUE_FULL) ：projdefs.h
 
 /**********常用宏**********/
 
-pdTRUE=1 pdFALSE=0 pdPASS=1 pdFAIL=0
+pdTRUE=1 ； pdFALSE=0 ； pdPASS=1 ； pdFAIL=0
 
 
 # 常用函数：
