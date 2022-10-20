@@ -125,6 +125,14 @@ void vTaskSuspendAll( void );
 #include “task.h”
 BaseType_t xTaskResumeAll( void );
 
+7./***查看Task列表 ：***/用于调试是了解系统运行的情况
+
+include “FreeRTOS.h”
+
+include “task.h”
+
+void vTaskList( char *pcWriteBuffer );
+
 
 # 使用xTaskCreate()进行参数设置时如果分配空间为1024会发生栈溢出（stack overflow）的情况; 
 
