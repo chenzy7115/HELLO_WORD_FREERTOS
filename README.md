@@ -94,6 +94,14 @@ pdTRUE=1 ； pdFALSE=0 ； pdPASS=1 ； pdFAIL=0
   include “task.h”
   
   void vTaskPrioritySet( TaskHandle_t pxTask, UBaseType_t uxNewPriority );
+  
+3./***挂起任务task ：***/  
+
+include “FreeRTOS.h”
+
+include “task.h”
+
+void vTaskSuspend( TaskHandle_t pxTaskToSuspend );
 
 
 # 使用xTaskCreate()进行参数设置时如果分配空间为1024会发生栈溢出（stack overflow）的情况; 
