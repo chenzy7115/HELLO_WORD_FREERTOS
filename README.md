@@ -79,7 +79,7 @@ pdTRUE=1 ； pdFALSE=0 ； pdPASS=1 ； pdFAIL=0
 # 常用函数：
 1./***获得函数优先级的函数 ：***/   UBaseType_t uxTaskPriorityGet( TaskHandle_t pxTask );
 
-默认最大优先级为24（0-24）共25个
+默认最大优先级为24（0-24）共25个,如果设置值超过/**24**/则编译器会改为24
 
 
 # 使用xTaskCreate()进行参数设置时如果分配空间为1024会发生栈溢出（stack overflow）的情况; 
