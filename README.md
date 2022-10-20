@@ -103,6 +103,14 @@ include “task.h”
 
 void vTaskSuspend( TaskHandle_t pxTaskToSuspend );
 
+4./***挂起恢复task ：***/ 
+
+include “FreeRTOS.h”
+
+include “task.h”
+
+void vTaskResume( TaskHandle_t pxTaskToResume );
+
 
 # 使用xTaskCreate()进行参数设置时如果分配空间为1024会发生栈溢出（stack overflow）的情况; 
 
