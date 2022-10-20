@@ -1,6 +1,6 @@
 # freeRTOS变量、函数命名规范
 
-/**********变量************/
+/**********变量**********/
 
 1.c Char
 
@@ -19,13 +19,29 @@
 8.pc char指针
 
 
-/**********函数************/
+/**********函数**********/
 
 9.vTaskPrioritySet 返回值类型：void 在task.c中定义
 
 10.xQueueReceive 返回值类型：BaseType_t 在queue.c中定义
 
-11.pvTimerGetTimerID 返回值类型：pointer to void在tmer.c中定义
+11.pvTimerGetTimerID 返回值类型：pointer to void在timer.c中定义
+
+/**********宏**********/
+
+12.port (比如portMAX_DELAY) 在portable.h或portmacro.h
+
+13.task (比如taskENTER_CRITICAL()) task.h
+
+14.pd (比如pdTRUE) projdefs.h
+
+15.config (比如configUSE_PREEMPTION) FreeRTOSConfig.h
+
+16.err (比如errQUEUE_FULL) projdefs.h
+
+/**********常用宏**********/
+
+pdTRUE=1 pdFALSE=0 pdPASS=1 pdFAIL=0
 
 
 # 常用函数：
