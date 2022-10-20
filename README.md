@@ -1,3 +1,35 @@
+# 数据类型
+
+每个移植的版本都含有自己的 portmacro.h 头文件，里面定义了2个数据类型：
+
+/***TickType_t：***/
+
+FreeRTOS配置了一个周期性的时钟中断：Tick Interrupt
+
+每发生一次中断，中断次数累加，这被称为tick count
+
+tick count这个变量的类型就是TickType_t
+
+TickType_t可以是16位的，也可以是32位的
+
+FreeRTOSConfig.h中定义configUSE_16_BIT_TICKS时，TickType_t就是uint16_t
+
+否则TickType_t就是uint32_t
+
+对于32位架构，建议把TickType_t配置为uint32_t
+
+/***BaseType_t：***/
+
+这是该架构最高效的数据类型
+
+32位架构中，它就是uint32_t
+
+16位架构中，它就是uint16_t
+
+8位架构中，它就是uint8_t
+
+BaseType_t通常用作简单的返回值的类型，还有逻辑值，比如 pdTRUE/pdFALSE
+
 # freeRTOS变量、函数命名规范
 
 /**********变量**********/
@@ -54,7 +86,7 @@ pdTRUE=1 ； pdFALSE=0 ； pdPASS=1 ； pdFAIL=0
 
 xTaskCreate(myTask, "myTask1", 2048, (void *) &xStructTest, 1, NULL);
 
-# Soc：ESP32   IDF:VSCODE   OS:freeRTOS   framwork:ESP32-IDF
+# Soc：ESP32 ;  IDF:VSCODE ;  OS:freeRTOS  ;  framwork:ESP32-IDF
 
 by chenzy
 2022-10-20
