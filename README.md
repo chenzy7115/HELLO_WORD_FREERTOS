@@ -103,7 +103,7 @@ include “task.h”
 
 void vTaskSuspend( TaskHandle_t pxTaskToSuspend );
 
-4./***挂起恢复task ：***/ 
+4./***恢复任务task ：***/ 
 
 include “FreeRTOS.h”
 
