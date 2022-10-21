@@ -167,6 +167,34 @@ UBaseType_t uxTaskGetStackHighWaterMark( TaskHandle_t xTask );
 3.esp_task_wdt_add(句柄) 开启看门口
  
   esp_task_wdt_reset(句柄) 喂狗
+  
+# 队列
+
+/***创建一个新的队列***/
+
+include “FreeRTOS.h”
+
+include “queue.h”
+
+QueueHandle_t xQueueCreate( UBaseType_t uxQueueLength, UBaseType_t uxItemSize );
+
+/***发送数据TO队列***/xQueueSend（）和 xQueueSendToBack（）的结果相同都是发送数据到队列的尾部，xQueueSendToFront（）发送到队列头
+
+include “FreeRTOS.h”
+
+include “queue.h”
+
+BaseType_t xQueueSend( QueueHandle_t xQueue, 
+ const void * pvItemToQueue, 
+ TickType_t xTicksToWait );
+
+BaseType_t xQueueSendToFront( QueueHandle_t xQueue, 
+ const void * pvItemToQueue, 
+ TickType_t xTicksToWait );
+
+BaseType_t xQueueSendToBack( QueueHandle_t xQueue, 
+ const void * pvItemToQueue, 
+ TickType_t xTicksToWait );
 
 
 # 使用xTaskCreate()进行参数设置时如果分配空间为1024会发生栈溢出（stack overflow）的情况; 
