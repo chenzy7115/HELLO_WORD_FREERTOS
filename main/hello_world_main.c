@@ -1,10 +1,5 @@
-/* Hello World Example
-
-   This example code is in the Public Domain (or CC0 licensed, at your option.)
-
-   Unless required by applicable law or agreed to in writing, this
-   software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
-   CONDITIONS OF ANY KIND, either express or implied.
+/* 
+test API of freeRTOS.
 */
 #include <stdio.h>
 #include "sdkconfig.h"
@@ -15,23 +10,32 @@
 
 #include "freertos/queue.h"
 
+typedef struct A_STRUCT
+{
+    char id;
+    char data;
+} xStruct;
+
 // ------------------------------------------------------------------------------
 void sendTasc(void *pvParam)
 {
     QueueHandle_t QHandle;
     QHandle = (QueueHandle_t)pvParam;
     BaseType_t xStatus;
-    char i = 0;
+    
+    char *pStrToSend;
+    int i = 0;
     while (1)
     {
-        xStatus = xQueueSend(QHandle, &i, 0);
-        if (xStatus !=)
+        pStrToSend = (char *)malloc(50);
+        snprintf(pStrToSend,50,"Today is good day %d!\r\n",i);
+        i++;
+
+        xStatus = xQueueSend(QHandle, &pStrToSend, 0);
+        if (xStatus != pdPASS)
             printf("Send fail!\n");
         else
             printf("Send done!\n");
-        i++;
-        if (i == 8)
-            i = 0;
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
 }
@@ -40,9 +44,25 @@ void recTasc(void *pvParam)
 {
     QueueHandle_t QHandle;
     QHandle = (QueueHandle_t)pvParam;
+    BaseType_t xStatus;
+    
+    char *pStrToRec;
     while (1)
     {
-        printf("task:111\n");
+        if (uxQueueMessagesWaiting(QHandle) != 0)
+        {
+            xStatus = xQueueReceive(QHandle, &pStrToRec, 0);
+            if (xStatus != pdPASS)
+                printf("Receive fail!\n");
+            else
+                printf("Receive message:%s",pStrToRec);
+            free(pStrToRec);
+        }
+        else
+        {
+            printf("No Data!\n");
+        }
+
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
 }
@@ -50,11 +70,11 @@ void recTasc(void *pvParam)
 // ------------------------------------------------------------------------------
 void app_main(void)
 {
-    TaskHandle_t = pxTask1;
-    QueueHandle_t = QHandle;
-    QHandle = xQueueCreate(5, sizeof(int))
+    // TaskHandle_t pxTask1;
+    QueueHandle_t QHandle;
+    QHandle = xQueueCreate(5, sizeof(char *));
 
-        if (QHandle != NULL)
+    if (QHandle != NULL)
     {
         printf("Create queue successfully!\n");
         xTaskCreate(sendTasc, "sendTasc", 1024 * 5, (void *)QHandle, 1, NULL);
@@ -64,30 +84,4 @@ void app_main(void)
     {
         printf("Can't create queue!\n");
     }
-
-    // printf("Hello world!\n");
-
-    // /* Print chip information */
-    // esp_chip_info_t chip_info;
-    // esp_chip_info(&chip_info);
-    // printf("This is %s chip with %d CPU core(s), WiFi%s%s, ",
-    //         CONFIG_IDF_TARGET,
-    //         chip_info.cores,
-    //         (chip_info.features & CHIP_FEATURE_BT) ? "/BT" : "",
-    //         (chip_info.features & CHIP_FEATURE_BLE) ? "/BLE" : "");
-
-    // printf("silicon revision %d, ", chip_info.revision);
-
-    // printf("%dMB %s flash\n", spi_flash_get_chip_size() / (1024 * 1024),
-    //         (chip_info.features & CHIP_FEATURE_EMB_FLASH) ? "embedded" : "external");
-
-    // printf("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
-
-    // for (int i = 10; i >= 0; i--) {
-    //     printf("Restarting in %d seconds...\n", i);
-    //     vTaskDelay(1000 / portTICK_PERIOD_MS);
-    // }
-    // printf("Restarting now.\n");
-    // fflush(stdout);
-    // esp_restart();
 }
