@@ -167,6 +167,16 @@ UBaseType_t uxTaskGetStackHighWaterMark( TaskHandle_t xTask );
 3.esp_task_wdt_add(句柄) 开启看门口
  
   esp_task_wdt_reset(句柄) 喂狗
+  
+# 队列
+
+/***创建一个新的队列***/
+
+include “FreeRTOS.h”
+
+include “queue.h”
+
+QueueHandle_t xQueueCreate( UBaseType_t uxQueueLength, UBaseType_t uxItemSize );
 
 
 # 使用xTaskCreate()进行参数设置时如果分配空间为1024会发生栈溢出（stack overflow）的情况; 
