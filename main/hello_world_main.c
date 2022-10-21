@@ -13,10 +13,33 @@
 #include "esp_system.h"
 #include "esp_spi_flash.h"
 
-#include "esp_task_wdt.h"//增加watch dog控制函数
+#include "freertos/queue.h"
 
-void myTask1(void *pvParam)
+// ------------------------------------------------------------------------------
+void sendTasc(void *pvParam)
 {
+    QueueHandle_t QHandle;
+    QHandle = (QueueHandle_t)pvParam;
+    BaseType_t xStatus;
+    char i = 0;
+    while (1)
+    {
+        xStatus = xQueueSend(QHandle, &i, 0);
+        if (xStatus !=)
+            printf("Send fail!\n");
+        else
+            printf("Send done!\n");
+        i++;
+        if (i == 8)
+            i = 0;
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+    }
+}
+
+void recTasc(void *pvParam)
+{
+    QueueHandle_t QHandle;
+    QHandle = (QueueHandle_t)pvParam;
     while (1)
     {
         printf("task:111\n");
@@ -24,45 +47,47 @@ void myTask1(void *pvParam)
     }
 }
 
-void myTask2(void *pvParam)
-{
-    esp_task_wdt_add(NULL);
-    while (1)
-    {
-        printf("task:222\n");
-        esp_task_wdt_reset();
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
-    }
-}
-
+// ------------------------------------------------------------------------------
 void app_main(void)
 {
-    // UBaseType_t iPriority = 0;
-    TaskHandle_t pxTask1 = NULL;
-    TaskHandle_t pxTask2 = NULL;
+    TaskHandle_t = pxTask1;
+    QueueHandle_t = QHandle;
+    QHandle = xQueueCreate(5, sizeof(int))
 
-    xTaskCreate(myTask1, "myTask1", 2048, NULL, 1, &pxTask1); //创建一个task
-    xTaskCreate(myTask2, "myTask2", 2048, NULL, 1, &pxTask2); //创建一个task
+        if (QHandle != NULL)
+    {
+        printf("Create queue successfully!\n");
+        xTaskCreate(sendTasc, "sendTasc", 1024 * 5, (void *)QHandle, 1, NULL);
+        xTaskCreate(recTasc, "recTasc", 1024 * 5, (void *)QHandle, 1, NULL);
+    }
+    else
+    {
+        printf("Can't create queue!\n");
+    }
 
-    UBaseType_t uxStack1;
+    // printf("Hello world!\n");
 
-    // while (1)
-    // {
-    //     uxStack1 = uxTaskGetStackHighWaterMark(pxTask1);
-    //     printf("uxStack1:%d\n", uxStack1);
-    //     vTaskDelay(3000 / portTICK_PERIOD_MS);
+    // /* Print chip information */
+    // esp_chip_info_t chip_info;
+    // esp_chip_info(&chip_info);
+    // printf("This is %s chip with %d CPU core(s), WiFi%s%s, ",
+    //         CONFIG_IDF_TARGET,
+    //         chip_info.cores,
+    //         (chip_info.features & CHIP_FEATURE_BT) ? "/BT" : "",
+    //         (chip_info.features & CHIP_FEATURE_BLE) ? "/BLE" : "");
+
+    // printf("silicon revision %d, ", chip_info.revision);
+
+    // printf("%dMB %s flash\n", spi_flash_get_chip_size() / (1024 * 1024),
+    //         (chip_info.features & CHIP_FEATURE_EMB_FLASH) ? "embedded" : "external");
+
+    // printf("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
+
+    // for (int i = 10; i >= 0; i--) {
+    //     printf("Restarting in %d seconds...\n", i);
+    //     vTaskDelay(1000 / portTICK_PERIOD_MS);
     // }
+    // printf("Restarting now.\n");
+    // fflush(stdout);
+    // esp_restart();
 }
-
-// vTaskSuspend(pxTask1);
-// vTaskDelay(5000 / portTICK_PERIOD_MS);
-// vTaskResume(pxTask1);
-
-// vTaskDelay(3000 / portTICK_PERIOD_MS);
-// vTaskSuspend(pxTask1);
-
-// vTaskPrioritySet(pxTask, 3);
-
-// iPriority = uxTaskPriorityGet(pxTask); //通过句柄获得task的优先级
-
-// printf("Task1's value : iPriority : %d\n", iPriority);
