@@ -128,7 +128,7 @@ include “task.h”
 
 BaseType_t xTaskResumeAll( void );
 
-7./***查看Task列表 ：***/用于调试时了解系统运行的情况
+7./***查看Task列表 ：***/用于调试时了解系统运行的情况，对系统资源使用量较大，并且不存在中断。使用时要对freeRTOS进行配置，默认不能使用。具体查看freeRTOS参考手册的说明
 
 include “FreeRTOS.h”
 
@@ -149,6 +149,24 @@ timeout.挂起（暂停）
 
 o ‘D’ if the task has been deleted, but the idle task has not yet freed the memory 
 that was being used by the task to hold its data structures and stack.删除
+
+8./***查看task剩余的stack的空间大小 ：***/用于查看creat创建的stack是否够用
+
+include “FreeRTOS.h”
+
+include “task.h”
+
+UBaseType_t uxTaskGetStackHighWaterMark( TaskHandle_t xTask );
+
+# watch dog的使用
+
+1.watch dog有两种，一种是中断的watch dog，一种是task的 watch dog.
+
+2.中断watch dog里面不能执行太多的代码，从而导致其他任务没有时间执行
+
+3.esp_task_wdt_add(句柄) 开启看门口
+ 
+  esp_task_wdt_reset(句柄) 喂狗
 
 
 # 使用xTaskCreate()进行参数设置时如果分配空间为1024会发生栈溢出（stack overflow）的情况; 
