@@ -128,7 +128,7 @@ include “task.h”
 
 BaseType_t xTaskResumeAll( void );
 
-7./***查看Task列表 ：***/用于调试时了解系统运行的情况，对系统资源使用量较大，并且不是存在中断
+7./***查看Task列表 ：***/用于调试时了解系统运行的情况，对系统资源使用量较大，并且不存在中断。使用时要对freeRTOS进行配置，默认不能使用。具体查看freeRTOS参考手册的说明
 
 include “FreeRTOS.h”
 
