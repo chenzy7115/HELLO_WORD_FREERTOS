@@ -195,7 +195,24 @@ BaseType_t xQueueSendToFront( QueueHandle_t xQueue,
 BaseType_t xQueueSendToBack( QueueHandle_t xQueue, 
  const void * pvItemToQueue, 
  TickType_t xTicksToWait );
+ 
+ /***接收数据from队列***/
 
+include “FreeRTOS.h”
+
+include “queue.h”
+
+BaseType_t xQueueReceive( QueueHandle_t xQueue, 
+ void *pvBuffer, 
+ TickType_t xTicksToWait );
+
+ /***获得队列中item的个数***/
+ 
+include “FreeRTOS.h”
+
+include “queue.h”
+
+UBaseType_t uxQueueMessagesWaiting( const QueueHandle_t xQueue );
 
 # 使用xTaskCreate()进行参数设置时如果分配空间为1024会发生栈溢出（stack overflow）的情况; 
 
