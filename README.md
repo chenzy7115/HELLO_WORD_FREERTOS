@@ -128,7 +128,7 @@ include “task.h”
 
 BaseType_t xTaskResumeAll( void );
 
-7./***查看Task列表 ：***/用于调试时了解系统运行的情况
+7./***查看Task列表 ：***/用于调试时了解系统运行的情况，对系统资源使用量较大，并且不是存在中断
 
 include “FreeRTOS.h”
 
@@ -149,6 +149,14 @@ timeout.挂起（暂停）
 
 o ‘D’ if the task has been deleted, but the idle task has not yet freed the memory 
 that was being used by the task to hold its data structures and stack.删除
+
+8./***查看task剩余的stack的空间大小 ：***/用于查看creat创建的stack是否够用
+
+include “FreeRTOS.h”
+
+include “task.h”
+
+UBaseType_t uxTaskGetStackHighWaterMark( TaskHandle_t xTask );
 
 
 # 使用xTaskCreate()进行参数设置时如果分配空间为1024会发生栈溢出（stack overflow）的情况; 
