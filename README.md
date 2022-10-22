@@ -350,7 +350,7 @@ include “semphr.h”
 
 BaseType_t xSemaphoreTake( SemaphoreHandle_t xSemaphore, TickType_t xTicksToWait );
 
-#计数性信号量
+# 计数性信号量
 
 /***创建一个计数型信号量***/
 
