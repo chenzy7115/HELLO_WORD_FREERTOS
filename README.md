@@ -214,6 +214,32 @@ include “queue.h”
 
 UBaseType_t uxQueueMessagesWaiting( const QueueHandle_t xQueue );
 
+ /***创建队列集合(QUEUE SET)***/
+
+include “FreeRTOS.h”
+
+include “queue.h”
+
+QueueSetHandle_t xQueueCreateSet( const UBaseType_t uxEventQueueLength );
+
+ /***加入队列集合(ADD SET)***/
+
+include “FreeRTOS.h”
+
+include “queue.h”
+
+BaseType_t xQueueAddToSet( QueueSetMemberHandle_t xQueueOrSemaphore,
+ QueueSetHandle_t xQueueSet );
+
+ /***选择从队列集合中获得数据(select from set)***/
+
+include “FreeRTOS.h”
+
+include “queue.h”
+
+QueueSetMemberHandle_t xQueueSelectFromSet( QueueSetHandle_t xQueueSet,
+ const TickType_t xTicksToWait );
+
 # 使用xTaskCreate()进行参数设置时如果分配空间为1024会发生栈溢出（stack overflow）的情况; 
 
 目前发现只在ESP32中发生，至少可以确定的是ESP32C3不会出现问题。解决办法是增加分配给task的内存空间，具体需要增加多少没有进行测试。code：
