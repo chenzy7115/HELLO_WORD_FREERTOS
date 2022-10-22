@@ -73,7 +73,7 @@ BaseType_t通常用作简单的返回值的类型，还有逻辑值，比如 pdT
 
 /**********常用宏**********/
 
-pdTRUE=1 ； pdFALSE=0 ； pdPASS=1 ； pdFAIL=0
+pdTRUE=1 ； pdFALSE=0 ； pdPASS=1 ； pdFAIL=0 ; pdMS_TO_TICKS(1000):毫秒转为秒
 
 
 # 常用函数：
@@ -239,6 +239,135 @@ include “queue.h”
 
 QueueSetMemberHandle_t xQueueSelectFromSet( QueueSetHandle_t xQueueSet,
  const TickType_t xTicksToWait );
+
+ /***重写队列里所有数据(over write)***/
+
+include “FreeRTOS.h”
+
+include “queue.h”
+
+BaseType_t xQueueOverwrite( QueueHandle_t xQueue, const void *pvItemToQueue );
+
+/***获取队列里数据但不会删除队列里的数据(peek)***/
+
+include “FreeRTOS.h”
+
+include “queue.h”
+
+BaseType_t xQueuePeek( QueueHandle_t xQueue, 
+ void *pvBuffer, TickType_t
+ xTicksToWait );
+
+ # RTOS的软件定时器：1.同平台无关；2.同硬件的定时器数量无关
+
+ /***创建一个软件定时器***/
+ 
+include “FreeRTOS.h”
+
+include “timers.h”
+
+TimerHandle_t xTimerCreate( const char *pcTimerName, 
+ const TickType_t xTimerPeriod, 
+ const UBaseType_t uxAutoReload, 
+ void * const pvTimerID, 
+ TimerCallbackFunction_t pxCallbackFunction );
+
+ /***创建一个软件定时器***/
+
+include “FreeRTOS.h”
+
+include “timers.h”
+
+BaseType_t xTimerStart( TimerHandle_t xTimer, TickType_t xTicksToWait );
+
+ /***打开/关闭一个软件定时器***/xTimerStart()打开，xTimerStop()关闭
+
+include “FreeRTOS.h”
+
+include “timers.h”
+
+BaseType_t xTimerStart( TimerHandle_t xTimer, TickType_t xTicksToWait );
+
+BaseType_t xTimerStop( TimerHandle_t xTimer, TickType_t xTicksToWait );
+
+ /***获得定时器的name***/
+
+include “FreeRTOS.h”
+
+include “timers.h”
+
+const char * pcTimerGetName( TimerHandle_t xTimer );
+
+/***获得定时器的ID***/
+
+include “FreeRTOS.h”
+
+include “timers.h”
+
+void *pvTimerGetTimerID( TimerHandle_t xTimer );
+
+/***Reset Timer***/
+
+include “FreeRTOS.h”
+
+include “timers.h”
+
+BaseType_t xTimerReset( TimerHandle_t xTimer, TickType_t xTicksToWait );
+
+/***改变定时运行周期(Period:周期)***/
+
+include “FreeRTOS.h”
+
+include “timers.h”
+
+BaseType_t xTimerChangePeriod( TimerHandle_t xTimer, 
+ TickType_t xNewPeriod,
+ TickType_t xTicksToWait );
+
+ # 二进制信号量
+
+ /***二进制信号量的创建Create binary semephore***/
+
+include “FreeRTOS.h”
+
+include “semphr.h”
+
+SemaphoreHandle_t xSemaphoreCreateBinary( void );
+
+/***释放（GIVE）信号***/信号量被创建后先释放才可以使用，并且在使用信号量后也需要释放后才可以使用
+
+include “FreeRTOS.h”
+
+include “semphr.h”
+
+BaseType_t xSemaphoreGive( SemaphoreHandle_t xSemaphore );
+
+/***获取（TAKE）信号量***/
+
+include “FreeRTOS.h”
+
+include “semphr.h”
+
+BaseType_t xSemaphoreTake( SemaphoreHandle_t xSemaphore, TickType_t xTicksToWait );
+
+#计数性信号量
+
+/***创建一个计数型信号量***/
+
+include “FreeRTOS.h”
+
+include “semphr.h”
+
+SemaphoreHandle_t xSemaphoreCreateCounting( UBaseType_t uxMaxCount, 
+ UBaseType_t uxInitialCount );
+
+/***获取信号量的计数器GET COUNT***/
+
+include “FreeRTOS.h”
+
+include “semphr.h”
+
+UBaseType_t uxSemaphoreGetCount( SemaphoreHandle_t xSemaphore );
 
 # 使用xTaskCreate()进行参数设置时如果分配空间为1024会发生栈溢出（stack overflow）的情况; 
 
