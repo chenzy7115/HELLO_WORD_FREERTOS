@@ -369,6 +369,16 @@ include “semphr.h”
 
 UBaseType_t uxSemaphoreGetCount( SemaphoreHandle_t xSemaphore );
 
+# 互斥量（Mutex semaphore）
+
+/***建立互斥量（Create Mutex Semaphore***/
+
+include “FreeRTOS.h”
+
+include “semphr.h”
+
+SemaphoreHandle_t xSemaphoreCreateMutex( void );
+
 # 使用xTaskCreate()进行参数设置时如果分配空间为1024会发生栈溢出（stack overflow）的情况; 
 
 目前发现只在ESP32中发生，至少可以确定的是ESP32C3不会出现问题。解决办法是增加分配给task的内存空间，具体需要增加多少没有进行测试。code：
