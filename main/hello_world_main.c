@@ -15,79 +15,96 @@ https://space.bilibili.com/1338335828/channel/collectiondetail?sid=79734
 #include "freertos/queue.h"
 #include "freertos/timers.h"
 #include "freertos/semphr.h"
+#include "freertos/event_groups.h"
 
-// -----------------------------START 递归互斥量(Recursive Mutex Semaphore)--------------------------------------------
-//获得mutex的task会获得被互斥的task的优先级
-SemaphoreHandle_t mutexHandle;
+// -----------------------------START NOTIFICATION SYNC--------------------------------------------
 
-void Task1(void *pvParam)
+EventGroupHandle_t xEventBits;
+
+#define TASK_0_BIT (1 << 0)
+#define TASK_1_BIT (1 << 1)
+#define TASK_2_BIT (1 << 2)
+#define ALL_SYNC_BITS (TASK_0_BIT | TASK_1_BIT | TASK_2_BIT) //需要同步的位，0001 | 0010 | 0100 后的结果 0111 换为16进制 0X07
+
+void Task0(void *pvPavam)
 {
     while (1)
     {
-        printf("-------------------\n");
-        printf("Task-1 Begin!\n");
+        printf("---------------------\n");
+        printf("Task-0 Begin to wait!\n");
+        vTaskDelay(pdMS_TO_TICKS(1000));
 
-        xSemaphoreTakeRecursive(mutexHandle, portMAX_DELAY);
-        printf("Task-1 Take A !\n");
-        for (int i = 0; i < 10; i++)
-        {
-            printf("Task-1 i = %d for A\n", i);
-            vTaskDelay(pdMS_TO_TICKS(1000));
-        }
+        printf("---------------------\n");
+        printf("Task-0 set BIT_0!\n");
+        xEventGroupSync(xEventBits,
+                        TASK_0_BIT,    /* The bit to set. */
+                        ALL_SYNC_BITS, /* The bits to wait for. */
+                        portMAX_DELAY); /* Timeout value. */
+                        
+        printf("Task-0 Sync!\n");
+        vTaskDelay(pdMS_TO_TICKS(10000));
+    }
+}
 
-        xSemaphoreTakeRecursive(mutexHandle, portMAX_DELAY);
-        printf("Task-1 Take B !\n");
-        for (int i = 0; i < 10; i++)
-        {
-            printf("Task-1 i %d for B\n", i);
-            vTaskDelay(pdMS_TO_TICKS(1000));
-        }
-
-        printf("Task-1 Give B\n");
-        xSemaphoreGiveRecursive(mutexHandle);
+void Task1(void *pvParam)
+{
+    while(1)
+    {
+        printf("---------------------\n");
+        printf("Task-1 Begin to wait!\n"); 
         vTaskDelay(pdMS_TO_TICKS(3000));
 
-        printf("Task-1 Give A\n");
-        xSemaphoreGiveRecursive(mutexHandle);
-        vTaskDelay(pdMS_TO_TICKS(3000));
+        printf("---------------------\n");
+        printf("Task-1 set BIT_1!\n");
+        xEventGroupSync(xEventBits,
+                        TASK_1_BIT,    /* The bit to set. */
+                        ALL_SYNC_BITS, /* The bits to wait for. */
+                        portMAX_DELAY); /* Timeout value. */
+                        
+        printf("Task-1 Sync!\n");
+        vTaskDelay(pdMS_TO_TICKS(10000));
     }
 }
 
 void Task2(void *pvParam)
 {
-    vTaskDelay(pdMS_TO_TICKS(1000)); //阻塞一下，让优先级低的function能够运行
-    while (1)
+    while(1)
     {
-        printf("-------------------\n");
-        printf("Task-2 Begin!\n");
+        printf("---------------------\n");
+        printf("Task-2 Begin to wait!\n");
+        vTaskDelay(pdMS_TO_TICKS(5000));
 
-        xSemaphoreTakeRecursive(mutexHandle, portMAX_DELAY);
-        printf("Task-2 Take A !\n");
-        for (int i = 0; i < 10; i++)
-        {
-            printf("Task-2 i = %d for A\n", i);
-            vTaskDelay(pdMS_TO_TICKS(1000));
-        }
-
-        printf("Task-2 Give A\n");
-        xSemaphoreGiveRecursive(mutexHandle);
-        vTaskDelay(pdMS_TO_TICKS(3000));
+        printf("---------------------\n");
+        printf("Task-2 set BIT_2!\n");
+        xEventGroupSync(xEventBits,
+                        TASK_2_BIT,    /* The bit to set. */
+                        ALL_SYNC_BITS, /* The bits to wait for. */
+                        portMAX_DELAY); /* Timeout value. */
+                        
+        printf("Task-2 Sync!\n");
+        vTaskDelay(pdMS_TO_TICKS(10000));
     }
 }
 
 void app_main(void)
 {
-    mutexHandle = xSemaphoreCreateRecursiveMutex(); // Create Mutex 并获得handle
+    xEventBits = xEventGroupCreate();
 
-    vTaskSuspendAll(); //创建任务前挂起所有的任务调度器
-
-    xTaskCreate(Task1, "Task1", 1024 * 5, NULL, 1, NULL);
-    xTaskCreate(Task2, "Task2", 1024 * 5, NULL, 2, NULL);
-
-    xTaskResumeAll(); //创建任务后打开所有的任务调度器，确保任务开启顺序按优先级开始
+    if (xEventBits == NULL)
+    {
+        printf("Event Group Creata fail!\n");
+    }
+    else
+    {
+        vTaskSuspendAll(); // Create Task前先暂停（suspend）任务管理器
+        xTaskCreate(Task0, "Task0", 1024 * 5, NULL, 1, NULL);
+        xTaskCreate(Task1, "Task1", 1024 * 5, NULL, 1, NULL);
+        xTaskCreate(Task2, "Task2", 1024 * 5, NULL, 1, NULL);
+        xTaskResumeAll(); // Task创建后打开任务管理器，确保任务按设置的优先级执行
+    }
 }
 
-// ------------------------------------END 递归互斥量(Recursive Mutex Semaphore--------------------------------------
+// ------------------------------------END NOTIFICATION SYNC--------------------------------------
 
 // // -------------------------START队列的多进单出--------------------------------------------------
 // void sendTasc1(void *pvParam)
@@ -601,3 +618,158 @@ void app_main(void)
 // }
 
 // // ------------------------------------END 递归互斥量(Recursive Mutex Semaphore--------------------------------------
+
+// // -----------------------------START EVENT GROUP WAIT--------------------------------------------
+
+// EventGroupHandle_t xGreateEventGroup;
+
+// #define BIT_0 ( 1 << 0 )//第0位
+// #define BIT_4 ( 1 << 4 )//第4位
+
+// void Task1(void *pvParam)
+// {
+//     //EventBits_t uxBits;
+//     while (1)
+//     {
+//         printf("---------------------\n");
+//         printf("Task-1 Begin to wait!\n");
+//         xEventGroupWaitBits(
+//             xGreateEventGroup,//EVENT GROUP的HANDLE
+//             BIT_0 | BIT_4,//第0位按位或运算第4位得到结果0X0A（0000 1001）
+//             pdTRUE,//函数结束时，对0和4位清0
+//             pdTRUE,//设置为pdFALSE时，当0和4位有任何一个发生变化时就就退出BLOCK状态。设置为pdTRUE时，两个位的值都发生变化时退出BLOCK
+//             portMAX_DELAY//阻塞状态等待的时长，这里设置的是无限长
+//             );
+//         printf("---------------------\n");
+//         printf("In Task-1,BIT_0 and BIT_4 is set!\n");
+
+//         vTaskDelay(pdMS_TO_TICKS(1000));
+//     }
+// }
+
+// void Task2(void *pvParam)
+// {
+//     vTaskDelay(pdMS_TO_TICKS(1000)); //阻塞一下，让优先级低的function能够运行
+//     while (1)
+//     {
+//         printf("-------------------\n");
+//         printf("Task-2 Begin set Bit_0!\n");
+
+//         xEventGroupSetBits(xGreateEventGroup,BIT_0);
+//         vTaskDelay(pdMS_TO_TICKS(5000));
+
+//         printf("-------------------\n");
+//         printf("Task-2 Begin set Bit_4!\n");
+
+//         xEventGroupSetBits(xGreateEventGroup,BIT_4);
+//         vTaskDelay(pdMS_TO_TICKS(5000));
+//     }
+// }
+
+// void app_main(void)
+// {
+//     xGreateEventGroup = xEventGroupCreate();
+
+//     if (xGreateEventGroup == NULL)
+//     {
+//         printf("Event Group Creata fail!\n");
+//     }
+//     else
+//     {
+//         vTaskSuspendAll();//Create Task前先暂停（suspend）任务管理器
+//         xTaskCreate(Task1, "Task1", 1024 * 5, NULL, 1, NULL);
+//         xTaskCreate(Task2, "Task2", 1024 * 5, NULL, 2, NULL);
+//         xTaskResumeAll();//Task创建后打开任务管理器，确保任务按设置的优先级执行
+//     }
+// }
+
+// // ------------------------------------END EVENT GROUP WAIT--------------------------------------
+
+// // -----------------------------START EVENT GROUP SYNC--------------------------------------------
+
+// EventGroupHandle_t xEventBits;
+
+// #define TASK_0_BIT (1 << 0)
+// #define TASK_1_BIT (1 << 1)
+// #define TASK_2_BIT (1 << 2)
+// #define ALL_SYNC_BITS (TASK_0_BIT | TASK_1_BIT | TASK_2_BIT) //需要同步的位，0001 | 0010 | 0100 后的结果 0111 换为16进制 0X07
+
+// void Task0(void *pvPavam)
+// {
+//     while (1)
+//     {
+//         printf("---------------------\n");
+//         printf("Task-0 Begin to wait!\n");
+//         vTaskDelay(pdMS_TO_TICKS(1000));
+
+//         printf("---------------------\n");
+//         printf("Task-0 set BIT_0!\n");
+//         xEventGroupSync(xEventBits,
+//                         TASK_0_BIT,    /* The bit to set. */
+//                         ALL_SYNC_BITS, /* The bits to wait for. */
+//                         portMAX_DELAY); /* Timeout value. */
+                        
+//         printf("Task-0 Sync!\n");
+//         vTaskDelay(pdMS_TO_TICKS(10000));
+//     }
+// }
+
+// void Task1(void *pvParam)
+// {
+//     while(1)
+//     {
+//         printf("---------------------\n");
+//         printf("Task-1 Begin to wait!\n"); 
+//         vTaskDelay(pdMS_TO_TICKS(3000));
+
+//         printf("---------------------\n");
+//         printf("Task-1 set BIT_1!\n");
+//         xEventGroupSync(xEventBits,
+//                         TASK_1_BIT,    /* The bit to set. */
+//                         ALL_SYNC_BITS, /* The bits to wait for. */
+//                         portMAX_DELAY); /* Timeout value. */
+                        
+//         printf("Task-1 Sync!\n");
+//         vTaskDelay(pdMS_TO_TICKS(10000));
+//     }
+// }
+
+// void Task2(void *pvParam)
+// {
+//     while(1)
+//     {
+//         printf("---------------------\n");
+//         printf("Task-2 Begin to wait!\n");
+//         vTaskDelay(pdMS_TO_TICKS(5000));
+
+//         printf("---------------------\n");
+//         printf("Task-2 set BIT_2!\n");
+//         xEventGroupSync(xEventBits,
+//                         TASK_2_BIT,    /* The bit to set. */
+//                         ALL_SYNC_BITS, /* The bits to wait for. */
+//                         portMAX_DELAY); /* Timeout value. */
+                        
+//         printf("Task-2 Sync!\n");
+//         vTaskDelay(pdMS_TO_TICKS(10000));
+//     }
+// }
+
+// void app_main(void)
+// {
+//     xEventBits = xEventGroupCreate();
+
+//     if (xEventBits == NULL)
+//     {
+//         printf("Event Group Creata fail!\n");
+//     }
+//     else
+//     {
+//         vTaskSuspendAll(); // Create Task前先暂停（suspend）任务管理器
+//         xTaskCreate(Task0, "Task0", 1024 * 5, NULL, 1, NULL);
+//         xTaskCreate(Task1, "Task1", 1024 * 5, NULL, 1, NULL);
+//         xTaskCreate(Task2, "Task2", 1024 * 5, NULL, 1, NULL);
+//         xTaskResumeAll(); // Task创建后打开任务管理器，确保任务按设置的优先级执行
+//     }
+// }
+
+// // ------------------------------------END EVENT GROUP SYNC--------------------------------------

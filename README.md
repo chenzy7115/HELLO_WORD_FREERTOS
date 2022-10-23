@@ -413,6 +413,76 @@ include “semphr.h”
 
 BaseType_t xSemaphoreGiveRecursive( SemaphoreHandle_t xMutex );
 
+# Event Group
+
+/***创建EVENT GROUP***/ESP32共可以设置24bit
+
+include “FreeRTOS.h”
+
+include “event_groups.h”
+
+EventGroupHandle_t xEventGroupCreate( void );
+
+/***EVENT GROUP WAIT(等待方法)***/检查相应bit位，如果指定的bit被设置则继续运行，否则被清除就阻塞（Block）运行。***重要***不能被中断（interrupe）使用
+***由TASK使用***
+include “FreeRTOS.h”
+
+include “event_groups.h”
+
+EventBits_t xEventGroupWaitBits(
+ 
+ const EventGroupHandle_t xEventGroup,//获得EVENT GROUP的HANDLE
+ 
+ const EventBits_t uxBitsToWaitFor,//Exampl:BIT_0 | BIT_4要设置第0位按位或运算第4位得到结果0X0A（0000 1001）
+ 
+ const BaseType_t xClearOnExit,//pdTRUE函数结束时，对0和4位清0。pdFALSE函数结束时，对0和4位不清0
+ 
+ const BaseType_t xWaitForAllBits,//设置为pdFALSE时，当0和4位有任何一个发生变化时就就退出BLOCK状态。设置为pdTRUE时，两个位的值都发生变化时退出BLOCK
+ TickType_t xTicksToWait //设置等待时间
+ 
+ );
+
+/***设置EVENT GROUP的BIT***/
+
+include “FreeRTOS.h”
+
+include “event_groups.h”
+
+EventBits_t xEventGroupSetBits( EventGroupHandle_t xEventGroup,
+ const EventBits_t uxBitsToSet );
+
+/***EVENT GROUP Sync（同步方法）***/
+
+include “FreeRTOS.h”
+
+include “event_groups.h”
+
+EventBits_t xEventGroupSync( EventGroupHandle_t xEventGroup,//获得EVENT GROUP的HANDLE
+
+ const EventBits_t uxBitsToSet,//当前任务所使用的BIT
+
+ const EventBits_t uxBitsToWaitFor,//当前任务等待时用的BIT
+
+ TickType_t xTicksToWait );//设置阻塞时间
+
+# 任务的通知同步（Notification Sync）
+
+/***释放（GIVE）任务通知（Notification Give）***/
+
+include “FreeRTOS.h”
+
+include “task.h”
+
+BaseType_t xTaskNotifyGive( TaskHandle_t xTaskToNotify );
+
+/***获取（TAKE）任务通知（Notification TAKE）***/
+
+include “FreeRTOS.h”
+
+include “task.h”
+
+uint32_t ulTaskNotifyTake( BaseType_t xClearCountOnExit, TickType_t xTicksToWait );
+
 # 使用xTaskCreate()进行参数设置时如果分配空间为1024会发生栈溢出（stack overflow）的情况; 
 
 目前发现只在ESP32中发生，至少可以确定的是ESP32C3不会出现问题。解决办法是增加分配给task的内存空间，具体需要增加多少没有进行测试。code：
