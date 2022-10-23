@@ -73,8 +73,17 @@ BaseType_t通常用作简单的返回值的类型，还有逻辑值，比如 pdT
 
 /**********常用宏**********/
 
-pdTRUE=1 ； pdFALSE=0 ； pdPASS=1 ； pdFAIL=0 ; pdMS_TO_TICKS(1000):毫秒转为秒 ;portMAX_DELAY:无限等待
+pdTRUE=1
 
+pdFALSE=0
+
+pdPASS=1
+
+pdFAIL=0
+
+pdMS_TO_TICKS(1000):毫秒转为秒
+
+portMAX_DELAY:无限等待
 
 # 常用函数：
 1./***获得函数优先级的函数 ：***/  
