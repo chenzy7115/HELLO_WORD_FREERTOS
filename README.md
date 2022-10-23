@@ -73,7 +73,7 @@ BaseType_t通常用作简单的返回值的类型，还有逻辑值，比如 pdT
 
 /**********常用宏**********/
 
-pdTRUE=1 ； pdFALSE=0 ； pdPASS=1 ； pdFAIL=0 ; pdMS_TO_TICKS(1000):毫秒转为秒
+pdTRUE=1 ； pdFALSE=0 ； pdPASS=1 ； pdFAIL=0 ; pdMS_TO_TICKS(1000):毫秒转为秒 ;portMAX_DELAY:无限等待
 
 
 # 常用函数：
@@ -378,6 +378,31 @@ include “FreeRTOS.h”
 include “semphr.h”
 
 SemaphoreHandle_t xSemaphoreCreateMutex( void );
+
+/***建立递归互斥量（Create Recursive Mutex Semaphore***/
+
+include “FreeRTOS.h”
+
+include “semphr.h”
+
+SemaphoreHandle_t xSemaphoreCreateRecursiveMutex( void );
+
+/***获取（TAKE）递归互斥量（Create Recursive Mutex Semaphore***/
+
+include “FreeRTOS.h”
+
+include “semphr.h”
+
+BaseType_t xSemaphoreTakeRecursive( SemaphoreHandle_t xMutex, 
+ TickType_t xTicksToWait );
+
+/***释放（GIVE）递归互斥量（Create Recursive Mutex Semaphore***/
+
+include “FreeRTOS.h”
+
+include “semphr.h”
+
+BaseType_t xSemaphoreGiveRecursive( SemaphoreHandle_t xMutex );
 
 # 使用xTaskCreate()进行参数设置时如果分配空间为1024会发生栈溢出（stack overflow）的情况; 
 

@@ -16,89 +16,78 @@ https://space.bilibili.com/1338335828/channel/collectiondetail?sid=79734
 #include "freertos/timers.h"
 #include "freertos/semphr.h"
 
-// -----------------------------START 互斥量(Mutex Semaphore)--------------------------------------------
+// -----------------------------START 递归互斥量(Recursive Mutex Semaphore)--------------------------------------------
 //获得mutex的task会获得被互斥的task的优先级
 SemaphoreHandle_t mutexHandle;
 
 void Task1(void *pvParam)
 {
-    BaseType_t iRet;
     while (1)
     {
+        printf("-------------------\n");
         printf("Task-1 Begin!\n");
-        iRet = xSemaphoreTake(mutexHandle,1000);
-        if (iRet == pdPASS)
+
+        xSemaphoreTakeRecursive(mutexHandle, portMAX_DELAY);
+        printf("Task-1 Take A !\n");
+        for (int i = 0; i < 10; i++)
         {
-            printf("Task-1 Take!\n");
-            for (int i=0; i < 50; i++)
-            {
-                printf("Task-1 i = %d\n",i);
-                vTaskDelay(pdMS_TO_TICKS(1000));
-            }
-            xSemaphoreGive(mutexHandle);
-            printf("Task Give!\n");
+            printf("Task-1 i = %d for A\n", i);
             vTaskDelay(pdMS_TO_TICKS(1000));
         }
-        else
+
+        xSemaphoreTakeRecursive(mutexHandle, portMAX_DELAY);
+        printf("Task-1 Take B !\n");
+        for (int i = 0; i < 10; i++)
         {
-            printf("Task-1 didn't Take!\n");
+            printf("Task-1 i %d for B\n", i);
             vTaskDelay(pdMS_TO_TICKS(1000));
         }
+
+        printf("Task-1 Give B\n");
+        xSemaphoreGiveRecursive(mutexHandle);
+        vTaskDelay(pdMS_TO_TICKS(3000));
+
+        printf("Task-1 Give A\n");
+        xSemaphoreGiveRecursive(mutexHandle);
+        vTaskDelay(pdMS_TO_TICKS(3000));
     }
 }
 
 void Task2(void *pvParam)
 {
-    printf("Task-2 Begin!\n");
     vTaskDelay(pdMS_TO_TICKS(1000)); //阻塞一下，让优先级低的function能够运行
     while (1)
     {
-        ;
-    }
-}
+        printf("-------------------\n");
+        printf("Task-2 Begin!\n");
 
-void Task3(void *pvParam)
-{
-    BaseType_t iRet;
-
-    printf("Task-3 Begin!\n");
-    vTaskDelay(pdMS_TO_TICKS(1000)); //利用pdMS_TO_TICKS延迟1000ms也就是1秒,这里时阻塞以下，让优先级低的function能够运行
-    while (1)
-    {
-        iRet = xSemaphoreTake(mutexHandle, 1000); //获得Mutex的句柄，等待1000个机器周期
-        if (iRet == pdPASS)
+        xSemaphoreTakeRecursive(mutexHandle, portMAX_DELAY);
+        printf("Task-2 Take A !\n");
+        for (int i = 0; i < 10; i++)
         {
-            printf("Task-3 take!\n");
-            for (int i=0; i < 10; i++)
-            {
-                printf("Task-3 i = %d\n", i);
-                vTaskDelay(pdMS_TO_TICKS(1000));
-            }
-            xSemaphoreGive(mutexHandle);
-            printf("Task-3 Give!\n");
-            vTaskDelay(pdMS_TO_TICKS(5000));
-        }
-        else
-        {
-            printf("Task-3 didn't Take!\n");
+            printf("Task-2 i = %d for A\n", i);
             vTaskDelay(pdMS_TO_TICKS(1000));
         }
+
+        printf("Task-2 Give A\n");
+        xSemaphoreGiveRecursive(mutexHandle);
+        vTaskDelay(pdMS_TO_TICKS(3000));
     }
 }
 
 void app_main(void)
 {
-    mutexHandle = xSemaphoreCreateMutex(); // Create Mutex 并获得handle
-    // mutexHandle = xSemaphoreCreateBinary();//Create binary semaphore
+    mutexHandle = xSemaphoreCreateRecursiveMutex(); // Create Mutex 并获得handle
 
     vTaskSuspendAll(); //创建任务前挂起所有的任务调度器
+
     xTaskCreate(Task1, "Task1", 1024 * 5, NULL, 1, NULL);
     xTaskCreate(Task2, "Task2", 1024 * 5, NULL, 2, NULL);
-    xTaskCreate(Task3, "Task3", 1024 * 5, NULL, 3, NULL);
+
     xTaskResumeAll(); //创建任务后打开所有的任务调度器，确保任务开启顺序按优先级开始
 }
 
-// ------------------------------------END互斥量(Mutex Semaphore)--------------------------------------
+// ------------------------------------END 递归互斥量(Recursive Mutex Semaphore--------------------------------------
 
 // // -------------------------START队列的多进单出--------------------------------------------------
 // void sendTasc1(void *pvParam)
@@ -539,3 +528,76 @@ void app_main(void)
 // }
 
 // // ------------------------------------END互斥量(Mutex Semaphore)--------------------------------------
+
+// // -----------------------------START 递归互斥量(Recursive Mutex Semaphore)--------------------------------------------
+// //获得mutex的task会获得被互斥的task的优先级
+// SemaphoreHandle_t mutexHandle;
+
+// void Task1(void *pvParam)
+// {
+//     while (1)
+//     {
+//         printf("-------------------\n");
+//         printf("Task-1 Begin!\n");
+
+//         xSemaphoreTakeRecursive(mutexHandle, portMAX_DELAY);
+//         printf("Task-1 Take A !\n");
+//         for (int i = 0; i < 10; i++)
+//         {
+//             printf("Task-1 i = %d for A\n", i);
+//             vTaskDelay(pdMS_TO_TICKS(1000));
+//         }
+
+//         xSemaphoreTakeRecursive(mutexHandle, portMAX_DELAY);
+//         printf("Task-1 Take B !\n");
+//         for (int i = 0; i < 10; i++)
+//         {
+//             printf("Task-1 i %d for B\n", i);
+//             vTaskDelay(pdMS_TO_TICKS(1000));
+//         }
+
+//         printf("Task-1 Give B\n");
+//         xSemaphoreGiveRecursive(mutexHandle);
+//         vTaskDelay(pdMS_TO_TICKS(3000));
+
+//         printf("Task-1 Give A\n");
+//         xSemaphoreGiveRecursive(mutexHandle);
+//         vTaskDelay(pdMS_TO_TICKS(3000));
+//     }
+// }
+
+// void Task2(void *pvParam)
+// {
+//     vTaskDelay(pdMS_TO_TICKS(1000)); //阻塞一下，让优先级低的function能够运行
+//     while (1)
+//     {
+//         printf("-------------------\n");
+//         printf("Task-2 Begin!\n");
+
+//         xSemaphoreTakeRecursive(mutexHandle, portMAX_DELAY);
+//         printf("Task-2 Take A !\n");
+//         for (int i = 0; i < 10; i++)
+//         {
+//             printf("Task-2 i = %d for A\n", i);
+//             vTaskDelay(pdMS_TO_TICKS(1000));
+//         }
+
+//         printf("Task-2 Give A\n");
+//         xSemaphoreGiveRecursive(mutexHandle);
+//         vTaskDelay(pdMS_TO_TICKS(3000));
+//     }
+// }
+
+// void app_main(void)
+// {
+//     mutexHandle = xSemaphoreCreateRecursiveMutex(); // Create Mutex 并获得handle
+
+//     vTaskSuspendAll(); //创建任务前挂起所有的任务调度器
+
+//     xTaskCreate(Task1, "Task1", 1024 * 5, NULL, 1, NULL);
+//     xTaskCreate(Task2, "Task2", 1024 * 5, NULL, 2, NULL);
+
+//     xTaskResumeAll(); //创建任务后打开所有的任务调度器，确保任务开启顺序按优先级开始
+// }
+
+// // ------------------------------------END 递归互斥量(Recursive Mutex Semaphore--------------------------------------
