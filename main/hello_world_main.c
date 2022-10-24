@@ -19,7 +19,7 @@ https://space.bilibili.com/1338335828/channel/collectiondetail?sid=79734
 #include "freertos/event_groups.h"
 #include "freertos/stream_buffer.h"
 
-// -----------------------------START NOTIFICATION Value--------------------------------------------
+// -----------------------------START STream BUFF--------------------------------------------
 
 StreamBufferHandle_t StreamBufferHandle = NULL;
 
@@ -84,7 +84,7 @@ void app_main(void)
     }
 }
 
-// ------------------------------------END NOTIFICATION Value--------------------------------------
+// ------------------------------------END STream BUFF--------------------------------------
 
 // // -------------------------START队列的多进单出--------------------------------------------------
 // void sendTasc1(void *pvParam)
@@ -864,7 +864,7 @@ void app_main(void)
 
 // // ------------------------------------END NOTIFICATION Value--------------------------------------
 
-// // -----------------------------START NOTIFICATION Value--------------------------------------------
+// // -----------------------------START STream BUFF--------------------------------------------
 
 // StreamBufferHandle_t StreamBufferHandle = NULL;
 
@@ -929,4 +929,4 @@ void app_main(void)
 //     }
 // }
 
-// // ------------------------------------END NOTIFICATION Value--------------------------------------
+// // ------------------------------------END STream BUFF--------------------------------------
