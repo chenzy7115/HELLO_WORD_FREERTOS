@@ -18,10 +18,11 @@ https://space.bilibili.com/1338335828/channel/collectiondetail?sid=79734
 #include "freertos/semphr.h"
 #include "freertos/event_groups.h"
 #include "freertos/stream_buffer.h"
+#include "freertos/message_buffer.h"
 
-// -----------------------------START STream BUFF--------------------------------------------
+// -----------------------------START MESSSAGE BUFF ONE--------------------------------------------
 
-StreamBufferHandle_t StreamBufferHandle = NULL;
+MessageBufferHandle_t MessageBufferHandle = NULL;
 
 void Task1(void *pvParam)
 {
@@ -31,51 +32,47 @@ void Task1(void *pvParam)
 
     char tx_buff[50];
 
-    i++;
-    while (1)
+    for (int i=0 ; i<3 ; i++)
     {
-        i++;
-        str_len = sprintf(tx_buff, "Hello , I am Chenzy's NUM %d", i); //初始字符串函数，并返回字符串长度
-        send_bytes = xStreamBufferSend(StreamBufferHandle,
+        str_len = sprintf(tx_buff, "Hello , I am Chenzy's NO.: %d", i); //初始字符串函数，并返回字符串长度
+        send_bytes = xMessageBufferSend(MessageBufferHandle,
                                        (void *)tx_buff,
                                        str_len,
                                        portMAX_DELAY);
         printf("---------------------\n");
-        printf("Send str_len = %d ,send_bytes = %d\n", str_len, send_bytes);
+        printf("Send i = %d ,send_bytes = %d\n", i, send_bytes);
 
         vTaskDelay(pdMS_TO_TICKS(3000));
     }
+    vTaskDelete(NULL);
 }
 
 void Task2(void *pvParam)
 {
-    char rx_buff[50];
+    char rx_buff[200];
     int rec_bytes = 0;
     while (1)
     {
         vTaskDelay(pdMS_TO_TICKS(3000));
         memset(rx_buff, 0, sizeof(rx_buff)); //初始化接收数据的buff，将值都置零
 
-        rec_bytes = xStreamBufferReceive(StreamBufferHandle,
+        rec_bytes = xMessageBufferReceive(MessageBufferHandle,
                              (void *)rx_buff,
                              sizeof(rx_buff),
                              portMAX_DELAY);
         printf("---------------------\n");
         printf("Reseive rec_bytes = %d ,data = %s\n", rec_bytes, rx_buff);
-        
+        vTaskDelay(pdMS_TO_TICKS(1000));
     }
 }
 
 void app_main(void)
 {
-    StreamBufferHandle = xStreamBufferCreate(1000, 27); // BUFF的大小为1000字节，让接收函数接收到27字节才能解除阻塞（block）
-
-    if (StreamBufferHandle != NULL)
+    MessageBufferHandle = xMessageBufferCreate(1000); // BUFF的大小为1000字节
+    if (MessageBufferHandle != NULL)
     {
-        vTaskSuspendAll(); // Create Task前先暂停（suspend）任务管理器
         xTaskCreate(Task1, "Task1", 1024 * 5, NULL, 1, NULL);
         xTaskCreate(Task2, "Task2", 1024 * 5, NULL, 1, NULL);
-        xTaskResumeAll(); // Task创建后打开任务管理器，确保任务按设置的优先级执行
     }
     else
     {
@@ -84,7 +81,7 @@ void app_main(void)
     }
 }
 
-// ------------------------------------END STream BUFF--------------------------------------
+// ------------------------------------END MESSSAGE BUFF ONE-------------------------------------
 
 // // -------------------------START队列的多进单出--------------------------------------------------
 // void sendTasc1(void *pvParam)
@@ -930,3 +927,66 @@ void app_main(void)
 // }
 
 // // ------------------------------------END STream BUFF--------------------------------------
+
+// // -----------------------------START MESSSAGE BUFF ONE--------------------------------------------
+
+// MessageBufferHandle_t MessageBufferHandle = NULL;
+
+// void Task1(void *pvParam)
+// {
+//     int i = 0;
+//     int str_len;
+//     int send_bytes = 0;
+
+//     char tx_buff[50];
+
+//     for (int i=0 ; i<3 ; i++)
+//     {
+//         str_len = sprintf(tx_buff, "Hello , I am Chenzy's NO.: %d", i); //初始字符串函数，并返回字符串长度
+//         send_bytes = xMessageBufferSend(MessageBufferHandle,
+//                                        (void *)tx_buff,
+//                                        str_len,
+//                                        portMAX_DELAY);
+//         printf("---------------------\n");
+//         printf("Send i = %d ,send_bytes = %d\n", i, send_bytes);
+
+//         vTaskDelay(pdMS_TO_TICKS(3000));
+//     }
+//     vTaskDelete(NULL);
+// }
+
+// void Task2(void *pvParam)
+// {
+//     char rx_buff[200];
+//     int rec_bytes = 0;
+//     while (1)
+//     {
+//         vTaskDelay(pdMS_TO_TICKS(3000));
+//         memset(rx_buff, 0, sizeof(rx_buff)); //初始化接收数据的buff，将值都置零
+
+//         rec_bytes = xMessageBufferReceive(MessageBufferHandle,
+//                              (void *)rx_buff,
+//                              sizeof(rx_buff),
+//                              portMAX_DELAY);
+//         printf("---------------------\n");
+//         printf("Reseive rec_bytes = %d ,data = %s\n", rec_bytes, rx_buff);
+//         vTaskDelay(pdMS_TO_TICKS(1000));
+//     }
+// }
+
+// void app_main(void)
+// {
+//     MessageBufferHandle = xMessageBufferCreate(1000); // BUFF的大小为1000字节
+//     if (MessageBufferHandle != NULL)
+//     {
+//         xTaskCreate(Task1, "Task1", 1024 * 5, NULL, 1, NULL);
+//         xTaskCreate(Task2, "Task2", 1024 * 5, NULL, 1, NULL);
+//     }
+//     else
+//     {
+//         printf("---------------------\n");
+//         printf("StreamBUFF fail !\n");
+//     }
+// }
+
+// // ------------------------------------END MESSSAGE BUFF ONE-------------------------------------

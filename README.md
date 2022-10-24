@@ -548,6 +548,44 @@ size_t xStreamBufferReceive( StreamBufferHandle_t xStreamBuffer,//要接收的BU
 
  TickType_t xTicksToWait );//等待时间
 
+ # Message Buff
+
+/***创建MESSAGE BUFF***/
+
+#include “FreeRTOS.h”
+
+#include “message_buffer.h”
+
+MessageBufferHandle_t xMessageBufferCreate( size_t xBufferSizeBytes );
+
+/***发送MESSAGE BUFF***/
+
+#include “FreeRTOS.h”
+
+#include “message_buffer.h”
+
+size_t xMessageBufferSend( MessageBufferHandle_t xMessageBuffer,
+
+ const void *pvTxData,
+
+ size_t xDataLengthBytes,
+
+ TickType_t xTicksToWait );
+
+ /***接收MESSAGE BUFF***/
+
+#include “FreeRTOS.h”
+
+#include “message_buffer.h”
+
+size_t xMessageBufferReceive( MessageBufferHandle_t xMessageBuffer,
+
+ void *pvRxData,
+
+ size_t xBufferLengthBytes,
+
+ TickType_t xTicksToWait );
+
 # 使用xTaskCreate()进行参数设置时如果分配空间为1024会发生栈溢出（stack overflow）的情况; 
 
 目前发现只在ESP32中发生，至少可以确定的是ESP32C3不会出现问题。解决办法是增加分配给task的内存空间，具体需要增加多少没有进行测试。code：
