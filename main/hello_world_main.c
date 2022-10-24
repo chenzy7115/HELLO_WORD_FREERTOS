@@ -20,7 +20,7 @@ https://space.bilibili.com/1338335828/channel/collectiondetail?sid=79734
 #include "freertos/stream_buffer.h"
 #include "freertos/message_buffer.h"
 
-// -----------------------------START MESSSAGE BUFF ONE--------------------------------------------
+// -----------------------------START MESSSAGE BUFF TWO--------------------------------------------
 
 MessageBufferHandle_t MessageBufferHandle = NULL;
 
@@ -81,7 +81,7 @@ void app_main(void)
     }
 }
 
-// ------------------------------------END MESSSAGE BUFF ONE-------------------------------------
+// ------------------------------------END MESSSAGE BUFF TWO-------------------------------------
 
 // // -------------------------START队列的多进单出--------------------------------------------------
 // void sendTasc1(void *pvParam)
