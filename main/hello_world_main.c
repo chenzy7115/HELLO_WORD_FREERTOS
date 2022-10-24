@@ -7,6 +7,7 @@ https://space.bilibili.com/1338335828/channel/collectiondetail?sid=79734
 3.从start to end是一个测试模块，需要单独使用，h文件不修改
 */
 #include <stdio.h>
+#include <string.h>
 #include "sdkconfig.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -16,48 +17,74 @@ https://space.bilibili.com/1338335828/channel/collectiondetail?sid=79734
 #include "freertos/timers.h"
 #include "freertos/semphr.h"
 #include "freertos/event_groups.h"
+#include "freertos/stream_buffer.h"
 
-// -----------------------------START NOTIFICATION SYNC--------------------------------------------
+// -----------------------------START NOTIFICATION Value--------------------------------------------
 
-static TaskHandle_t xTask1 = NULL;
+StreamBufferHandle_t StreamBufferHandle = NULL;
 
 void Task1(void *pvParam)
 {
+    int i = 0;
+    int str_len;
+    int send_bytes = 0;
+
+    char tx_buff[50];
+
+    i++;
     while (1)
     {
+        i++;
+        str_len = sprintf(tx_buff, "Hello , I am Chenzy's NUM %d", i); //初始字符串函数，并返回字符串长度
+        send_bytes = xStreamBufferSend(StreamBufferHandle,
+                                       (void *)tx_buff,
+                                       str_len,
+                                       portMAX_DELAY);
         printf("---------------------\n");
-        printf("Task-1 wait notification!\n");
+        printf("Send str_len = %d ,send_bytes = %d\n", str_len, send_bytes);
 
-        ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-
-        printf("---------------------\n");
-        printf("Task-1 got notification!\n");
         vTaskDelay(pdMS_TO_TICKS(3000));
     }
 }
 
 void Task2(void *pvParam)
 {
+    char rx_buff[50];
+    int rec_bytes = 0;
     while (1)
     {
-        vTaskDelay(pdMS_TO_TICKS(5000));
-        printf("---------------------\n");
-        printf("Task-2 will nofitication Task1!\n");
+        vTaskDelay(pdMS_TO_TICKS(3000));
+        memset(rx_buff, 0, sizeof(rx_buff)); //初始化接收数据的buff，将值都置零
 
-        // xTaskNotifyGive(Task1);
-        xTaskNotifyGive( xTask1 );
+        rec_bytes = xStreamBufferReceive(StreamBufferHandle,
+                             (void *)rx_buff,
+                             sizeof(rx_buff),
+                             portMAX_DELAY);
+        printf("---------------------\n");
+        printf("Reseive rec_bytes = %d ,data = %s\n", rec_bytes, rx_buff);
+        
     }
 }
 
 void app_main(void)
 {
-    vTaskSuspendAll(); // Create Task前先暂停（suspend）任务管理器
-    xTaskCreate(Task1, "Task1", 1024 * 5, NULL, 1, &xTask1);
-    xTaskCreate(Task2, "Task2", 1024 * 5, NULL, 1, NULL);
-    xTaskResumeAll(); // Task创建后打开任务管理器，确保任务按设置的优先级执行
+    StreamBufferHandle = xStreamBufferCreate(1000, 27); // BUFF的大小为1000字节，让接收函数接收到27字节才能解除阻塞（block）
+
+    if (StreamBufferHandle != NULL)
+    {
+        vTaskSuspendAll(); // Create Task前先暂停（suspend）任务管理器
+        xTaskCreate(Task1, "Task1", 1024 * 5, NULL, 1, NULL);
+        xTaskCreate(Task2, "Task2", 1024 * 5, NULL, 1, NULL);
+        xTaskResumeAll(); // Task创建后打开任务管理器，确保任务按设置的优先级执行
+    }
+    else
+    {
+        printf("---------------------\n");
+        printf("StreamBUFF fail !\n");
+    }
 }
 
-// ------------------------------------END NOTIFICATION SYNC--------------------------------------
+// ------------------------------------END NOTIFICATION Value--------------------------------------
 
 // // -------------------------START队列的多进单出--------------------------------------------------
 // void sendTasc1(void *pvParam)
@@ -766,3 +793,140 @@ void app_main(void)
 // }
 
 // // ------------------------------------END NOTIFICATION SYNC--------------------------------------
+
+// // -----------------------------START NOTIFICATION Value--------------------------------------------
+
+// static TaskHandle_t xTask1 = NULL;
+
+// void Task1(void *pvParam)
+// {
+//     uint32_t ulNotifiedValue;
+//     while (1)
+//     {
+//         printf("---------------------\n");
+//         printf("Task-1 wait notification!\n");
+
+//         xTaskNotifyWait(0x00,             /* Don't clear any notification bits on entry. */
+//                         ULONG_MAX,        /* Reset the notification value to 0 on exit. */
+//                         &ulNotifiedValue, /* Notified value pass out in ulNotifiedValue. */
+//                         portMAX_DELAY);   /* Block indefinitely. */
+//         /* Process any events that have been latched in the notified value. */
+//         if ((ulNotifiedValue & 0x01) != 0)
+//         {
+//             /* Bit 0 was set - process whichever event is represented by bit 0. */
+//             printf("Task-1 process BIT 0 Even!\n");
+//         }
+//         if ((ulNotifiedValue & 0x02) != 0)
+//         {
+//             /* Bit 1 was set - process whichever event is represented by bit 1. */
+//             printf("Task-1 process BIT 1 Even!\n");
+//         }
+//         if ((ulNotifiedValue & 0x04) != 0)
+//         {
+//             /* Bit 2 was set - process whichever event is represented by bit 2. */
+//             printf("Task-1 process BIT 4 Even!\n");
+//         }
+
+//         vTaskDelay(pdMS_TO_TICKS(3000));
+//     }
+// }
+
+// void Task2(void *pvParam)
+// {
+//     while (1)
+//     {
+//         vTaskDelay(pdMS_TO_TICKS(5000));
+//         printf("---------------------\n");
+//         printf("Task-2 will nofitication Task1,input 0x01\n");
+
+//         xTaskNotify( xTask1, 0x01, eSetValueWithOverwrite );
+//         vTaskDelay(pdMS_TO_TICKS(5000));
+
+//         printf("---------------------\n");
+//         printf("Task-2 will nofitication Task1,input 0x02\n");
+//         xTaskNotify( xTask1, 0x02, eSetValueWithOverwrite );
+//         vTaskDelay(pdMS_TO_TICKS(5000));
+
+//         printf("---------------------\n");
+//         printf("Task-2 will nofitication Task1,input 0x04\n");
+//         xTaskNotify( xTask1, 0x04, eSetValueWithOverwrite );
+//         vTaskDelay(pdMS_TO_TICKS(5000));
+//     }
+// }
+
+// void app_main(void)
+// {
+//     vTaskSuspendAll(); // Create Task前先暂停（suspend）任务管理器
+//     xTaskCreate(Task1, "Task1", 1024 * 5, NULL, 1, &xTask1);
+//     xTaskCreate(Task2, "Task2", 1024 * 5, NULL, 1, NULL);
+//     xTaskResumeAll(); // Task创建后打开任务管理器，确保任务按设置的优先级执行
+// }
+
+// // ------------------------------------END NOTIFICATION Value--------------------------------------
+
+// // -----------------------------START NOTIFICATION Value--------------------------------------------
+
+// StreamBufferHandle_t StreamBufferHandle = NULL;
+
+// void Task1(void *pvParam)
+// {
+//     int i = 0;
+//     int str_len;
+//     int send_bytes = 0;
+
+//     char tx_buff[50];
+
+//     i++;
+//     while (1)
+//     {
+//         i++;
+//         str_len = sprintf(tx_buff, "Hello , I am Chenzy's NUM %d", i); //初始字符串函数，并返回字符串长度
+//         send_bytes = xStreamBufferSend(StreamBufferHandle,
+//                                        (void *)tx_buff,
+//                                        str_len,
+//                                        portMAX_DELAY);
+//         printf("---------------------\n");
+//         printf("Send str_len = %d ,send_bytes = %d\n", str_len, send_bytes);
+
+//         vTaskDelay(pdMS_TO_TICKS(3000));
+//     }
+// }
+
+// void Task2(void *pvParam)
+// {
+//     char rx_buff[50];
+//     int rec_bytes = 0;
+//     while (1)
+//     {
+//         vTaskDelay(pdMS_TO_TICKS(3000));
+//         memset(rx_buff, 0, sizeof(rx_buff)); //初始化接收数据的buff，将值都置零
+
+//         rec_bytes = xStreamBufferReceive(StreamBufferHandle,
+//                              (void *)rx_buff,
+//                              sizeof(rx_buff),
+//                              portMAX_DELAY);
+//         printf("---------------------\n");
+//         printf("Reseive rec_bytes = %d ,data = %s\n", rec_bytes, rx_buff);
+        
+//     }
+// }
+
+// void app_main(void)
+// {
+//     StreamBufferHandle = xStreamBufferCreate(1000, 27); // BUFF的大小为1000字节，让接收函数接收到27字节才能解除阻塞（block）
+
+//     if (StreamBufferHandle != NULL)
+//     {
+//         vTaskSuspendAll(); // Create Task前先暂停（suspend）任务管理器
+//         xTaskCreate(Task1, "Task1", 1024 * 5, NULL, 1, NULL);
+//         xTaskCreate(Task2, "Task2", 1024 * 5, NULL, 1, NULL);
+//         xTaskResumeAll(); // Task创建后打开任务管理器，确保任务按设置的优先级执行
+//     }
+//     else
+//     {
+//         printf("---------------------\n");
+//         printf("StreamBUFF fail !\n");
+//     }
+// }
+
+// // ------------------------------------END NOTIFICATION Value--------------------------------------

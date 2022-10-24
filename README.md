@@ -483,6 +483,71 @@ include “task.h”
 
 uint32_t ulTaskNotifyTake( BaseType_t xClearCountOnExit, TickType_t xTicksToWait );
 
+/***任务通知等待（Notification Wait）***/
+
+include “FreeRTOS.h”
+
+include “task.h”
+
+BaseType_t xTaskNotifyWait( uint32_t ulBitsToClearOnEntry,//进入函数时清除开关
+
+ uint32_t ulBitsToClearOnExit,//退出函数时清除开关
+
+ uint32_t *pulNotificationValue,//获得通知值
+
+ TickType_t xTicksToWait );//等待时间 
+
+/***发生任务通知的值***/
+
+include “FreeRTOS.h”
+
+include “task.h”
+
+BaseType_t xTaskNotify( TaskHandle_t xTaskToNotify, //指定发送的TASK的handle
+
+ uint32_t ulValue, //要发送的值
+
+ eNotifyAction eAction );//发送的模式设置，具体解释看API参考手册
+
+# 数据流的缓冲（stream BUff)
+
+/***创建stream buff***/
+
+include “FreeRTOS.h”
+
+include “stream_buffer.h”
+
+StreamBufferHandle_t xStreamBufferCreate( size_t xBufferSizeBytes,
+ size_t xTriggerLevelBytes );
+
+/***发送数据给stream buff***/返回有多少数据被写入BUFF
+
+include “FreeRTOS.h”
+
+include “stream_buffer.h”
+
+size_t xStreamBufferSend( StreamBufferHandle_t xStreamBuffer,//要发送给的BUFF的句柄
+ 
+ const void *pvTxData,//要发送值的指正
+ 
+ size_t xDataLengthBytes,//数据
+ 
+ TickType_t xTicksToWait );//等待时间
+
+/***接收stream buff数据***/返回有多少数据被写入BUFF
+
+include “FreeRTOS.h”
+
+include “stream_buffer.h”
+
+size_t xStreamBufferReceive( StreamBufferHandle_t xStreamBuffer,//要接收的BUFF的句柄
+
+ void *pvRxData,//接收数据存放的BUFF指针
+
+ size_t xBufferLengthBytes,//接收数据BUFF的长度
+
+ TickType_t xTicksToWait );//等待时间
+
 # 使用xTaskCreate()进行参数设置时如果分配空间为1024会发生栈溢出（stack overflow）的情况; 
 
 目前发现只在ESP32中发生，至少可以确定的是ESP32C3不会出现问题。解决办法是增加分配给task的内存空间，具体需要增加多少没有进行测试。code：
