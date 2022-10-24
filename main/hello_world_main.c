@@ -26,7 +26,7 @@ MessageBufferHandle_t MessageBufferHandle = NULL;
 
 void Task1(void *pvParam)
 {
-    int i = 0;
+   
     int str_len;
     int send_bytes = 0;
 
